@@ -2,6 +2,10 @@
 
 This repository includes contracts for NEAR Academy
 
+## ⚠️ Warning
+
+Any content produced by NEAR, or developer resources that NEAR provides, are for educational and inspiration purposes only.  NEAR does not encourage, induce or sanction the deployment of any such applications in violation of applicable laws or regulations.
+
 ## Usage
 
 ### Getting started
