@@ -49,6 +49,7 @@ export class Meme {
     public title: string,
     public data: string,
     public category: Category,
+    public owner: AccountId,
   ) { }
 
 
@@ -56,12 +57,12 @@ export class Meme {
   // Basic functions
   // ----------------------------------------------------------------------------
 
-  static create(title: string, data: string, category: Category): void {
+  static create(title: string, data: string, category: Category, owner: AccountId): void {
     // data has to have identifier from valid content provider
     assert(is_valid_meme_data(data), "Data is not valid, must start with valid 9gag.com URL")
 
     // save the meme to storage
-    const meme = new Meme(title, data, category)
+    const meme = new Meme(title, data, category, owner)
     this.set(meme)
   }
 

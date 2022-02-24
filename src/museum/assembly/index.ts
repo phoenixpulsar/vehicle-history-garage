@@ -64,7 +64,8 @@ export function add_meme(
   meme: AccountId,
   title: string,
   data: string,
-  category: Category
+  category: Category,
+  owner: AccountId
 ): void {
   assert_contract_is_initialized()
   assert_signed_by_contributor_or_owner()
@@ -89,7 +90,7 @@ export function add_meme(
 
   promise.function_call(
     "init",
-    new MemeInitArgs(title, data, category),
+    new MemeInitArgs(title, data, category, owner),
     context.attachedDeposit,
     XCC_GAS
   )

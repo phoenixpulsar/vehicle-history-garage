@@ -21,8 +21,9 @@ import { Comment, Vote, Meme, Donation } from "./models";
  * @param title the name of the meme
  * @param data the data containing some unique identifier of the meme used for rendering
  * @param category the category of the meme
+ * @param owner the owner of the meme
  */
-export function init(title: string, data: string, category: Category): void {
+export function init(title: string, data: string, category: Category, owner: AccountId): void {
   // contract may only be initialized once
   assert(!is_initialized(), "Contract is already initialized.");
 
@@ -36,7 +37,7 @@ export function init(title: string, data: string, category: Category): void {
   assert(title.length > 0, "Meme title may not be blank");
 
   // create the meme using incoming metadata
-  Meme.create(title, data, category)
+  Meme.create(title, data, category, owner)
 }
 
 /**
@@ -59,6 +60,8 @@ export function get_meme(): Meme {
 export function vote(value: i8): void {
   assert_contract_is_initialized()
   assert(context.sender == context.predecessor, "Users must vote directly")
+  // tes only owner can sign
+  assert_signed_by_owner()
   assert(value == 1 || value == -1, "Invalid vote, must be -1 or 1")
 
   // register the vote
@@ -195,8 +198,19 @@ function is_creator(): bool {
   return context.predecessor == Meme.get().creator
 }
 
+/**
+ * Indicate whether contract caller is the creator
+ */
+function is_owner():bool {
+  return context.predecessor == Meme.get().owner
+}
+
 function assert_signed_by_creator(): void {
   assert(is_creator(), "This method can only be called by the meme creator")
+}
+
+function assert_signed_by_owner(): void {
+  assert(is_owner(), "This method can only be called by the meme owner")
 }
 
 /**

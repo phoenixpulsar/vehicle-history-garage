@@ -105,7 +105,8 @@ export class MemeInitArgs {
   constructor(
     public title: string,
     public data: string,
-    public category: Category
+    public category: Category,
+    public owner: AccountId
   ) { }
 }
 
