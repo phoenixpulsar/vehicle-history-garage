@@ -7,7 +7,7 @@ import {
 } from "near-sdk-as";
 
 import { VEHICLE_KEY, XCC_GAS, MIN_ACCOUNT_BALANCE, MAX_COMMENT_LENGTH, AccountId, Category } from "../../utils";
-import { Comment, Vote, Vehicle } from "./models";
+import { Comment, Vote, Vehicle, Donation } from "./models";
 
 /**
  * == PUBLIC METHODS ==========================================================
@@ -57,16 +57,16 @@ export function get_vehicle(): Vehicle {
  *
  * @param value the value of the vote, up vote is +1 and down vote is -1
  */
-// export function vote(value: i8): void {
-//   assert_contract_is_initialized()
-//   assert(context.sender == context.predecessor, "Users must vote directly")
-//   // test only owner can sign
-//   assert_signed_by_owner()
-//   assert(value == 1 || value == -1, "Invalid vote, must be -1 or 1")
+export function vote(value: i8): void {
+  assert_contract_is_initialized()
+  assert(context.sender == context.predecessor, "Users must vote directly")
+  // test only owner can sign
+  assert_signed_by_owner()
+  assert(value == 1 || value == -1, "Invalid vote, must be -1 or 1")
 
-//   // register the vote
-//   batch_vote(value, false)
-// }
+  // register the vote
+  batch_vote(value, false)
+}
 
 /**
  * Register a batched vote where several votes are captured together
@@ -74,31 +74,31 @@ export function get_vehicle(): Vehicle {
  * @param value the value of the batched vote, max possible batch score is +/- 127
  * @param isGroup
  */
-// export function batch_vote(value: i8, is_batch: bool = true): void {
-//   // register the vote
-//   if (is_batch) {
-//     assert(context.predecessor == context.contractName, "Batch votes may only be made by the Vehicle account")
-//   }
+export function batch_vote(value: i8, is_batch: bool = true): void {
+  // register the vote
+  if (is_batch) {
+    assert(context.predecessor == context.contractName, "Batch votes may only be made by the Vehicle account")
+  }
 
-//   const voter = is_batch ? "batch-" + context.predecessor : context.predecessor
-//   Vehicle.add_vote(voter, value)
-// }
+  const voter = is_batch ? "batch-" + context.predecessor : context.predecessor
+  Vehicle.add_vote(voter, value)
+}
 
 /**
  * Get a list ofrecent votes
  */
-// export function get_recent_votes(): Array<Vote> {
-//   assert_contract_is_initialized()
-//   return Vehicle.recent_votes()
-// }
+export function get_recent_votes(): Array<Vote> {
+  assert_contract_is_initialized()
+  return Vehicle.recent_votes()
+}
 
 /**
  * Get the current vote score
  */
-// export function get_vote_score(): i32 {
-//   assert_contract_is_initialized()
-//   return Vehicle.get().vote_score
-// }
+export function get_vote_score(): i32 {
+  assert_contract_is_initialized()
+  return Vehicle.get().vote_score
+}
 
 // ----------------------------------------------------------------------------
 // Comments
@@ -111,9 +111,7 @@ export function get_vehicle(): Vehicle {
  */
 export function add_comment(text: string): void {
   assert_contract_is_initialized()
-  
-  // assert(context.sender == context.predecessor, "Users must comment directly")
-  assert_signed_by_owner()
+  assert(context.sender == context.predecessor, "Users must comment directly")
   assert_reasonable_comment_length(text)
   Vehicle.add_comment(text)
 }
@@ -133,29 +131,29 @@ export function get_recent_comments(): Array<Comment> {
 /**
  * Donate tokens to the contract
  */
-// export function donate(): void {
-//   assert_contract_is_initialized()
-//   assert(context.sender == context.predecessor, "Users must donate directly")
-//   assert(context.attachedDeposit > u128.Zero, "Donor must attach some money")
+export function donate(): void {
+  assert_contract_is_initialized()
+  assert(context.sender == context.predecessor, "Users must donate directly")
+  assert(context.attachedDeposit > u128.Zero, "Donor must attach some money")
 
-//   Vehicle.add_donation()
-// }
+  Vehicle.add_donation()
+}
 
 /**
  * Get a list of donations
  */
-// export function get_donations_total(): u128 {
-//   assert_contract_is_initialized()
-//   return Vehicle.get().total_donations
-// }
+export function get_donations_total(): u128 {
+  assert_contract_is_initialized()
+  return Vehicle.get().total_donations
+}
 
 /**
  * Get a list o recent comments
  */
-// export function get_recent_donations(): Array<Donation> {
-//   assert_contract_is_initialized()
-//   return Vehicle.recent_donations()
-// }
+export function get_recent_donations(): Array<Donation> {
+  assert_contract_is_initialized()
+  return Vehicle.recent_donations()
+}
 
 
 /**
@@ -163,22 +161,22 @@ export function get_recent_comments(): Array<Comment> {
  *
  * @param account NEAR account to receive donations after release
  */
-// export function release_donations(account: AccountId): void {
-//   assert_contract_is_initialized()
-//   assert_signed_by_creator()
+export function release_donations(account: AccountId): void {
+  assert_contract_is_initialized()
+  assert_signed_by_creator()
 
-//   // transfer funds to provided account and call ourselves back once transfer is complete
-//   ContractPromiseBatch.create(account)
-//     .transfer(Vehicle.get().total_donations)
-//     .then(context.contractName).function_call("on_donations_released", "{}", u128.Zero, XCC_GAS)
-// }
+  // transfer funds to provided account and call ourselves back once transfer is complete
+  ContractPromiseBatch.create(account)
+    .transfer(Vehicle.get().total_donations)
+    .then(context.contractName).function_call("on_donations_released", "{}", u128.Zero, XCC_GAS)
+}
 
 /**
  * Callback method invoked once donation release is complete
  */
-// export function on_donations_released(): void {
-//   logging.log("Donations were released")
-// }
+export function on_donations_released(): void {
+  logging.log("Donations were released")
+}
 
 /**
  * == PRIVATE FUNCTIONS ========================================================
@@ -216,7 +214,7 @@ function assert_signed_by_owner(): void {
 }
 
 /**
- * Track whether or not the vehicle has been initialized.
+ * Track whether or not the meme has been initialized.
  */
 function is_initialized(): bool {
   return storage.hasKey(VEHICLE_KEY);
