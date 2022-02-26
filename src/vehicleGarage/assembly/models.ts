@@ -105,7 +105,12 @@ export class VehicleInitArgs {
     public title: string,
     public data: string,
     public category: Category,
-    public owner: AccountId
+    public owner: AccountId,
+    // Vehicle Contract
+    public make:string, 
+    public model:string, 
+    public dateAcquired:string,
+    public vehicleNotes:string
   ) { }
 }
 

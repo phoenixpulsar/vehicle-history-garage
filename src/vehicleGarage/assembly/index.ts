@@ -65,7 +65,11 @@ export function add_vehicle(
   title: string,
   data: string,
   category: Category,
-  owner: AccountId
+  owner: AccountId,
+  make:string, 
+  model:string, 
+  dateAcquired:string,
+  vehicleNotes:string
 ): void {
   assert_contract_is_initialized()
   assert_signed_by_contributor_or_owner()
@@ -90,7 +94,7 @@ export function add_vehicle(
 
   promise.function_call(
     "init",
-    new VehicleInitArgs(title, data, category, owner),
+    new VehicleInitArgs(title, data, category, owner, make, model, dateAcquired, vehicleNotes),
     context.attachedDeposit,
     XCC_GAS
   )

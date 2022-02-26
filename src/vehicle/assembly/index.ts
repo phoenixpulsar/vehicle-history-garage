@@ -22,8 +22,13 @@ import { Comment, Vote, Vehicle, Donation } from "./models";
  * @param data the data containing some unique identifier of the vehicle used for rendering
  * @param category the category of the vehicle
  * @param owner the owner of the vehicle
+ * @param make string
+ * @param model string
+ * @param dateAcquired string
+ * @param vehicleNotes string
+ 
  */
-export function init(title: string, data: string, category: Category, owner: AccountId): void {
+export function init(title: string, data: string, category: Category, owner: AccountId, make:string, model:string, dateAcquired:string, vehicleNotes:string): void {
   // contract may only be initialized once
   assert(!is_initialized(), "Contract is already initialized.");
 
@@ -37,7 +42,7 @@ export function init(title: string, data: string, category: Category, owner: Acc
   assert(title.length > 0, "Vehicle title may not be blank");
 
   // create the vehicle using incoming metadata
-  Vehicle.create(title, data, category, owner)
+  Vehicle.create(title, data, category, owner, make, model, dateAcquired, vehicleNotes)
 }
 
 /**
@@ -100,6 +105,14 @@ export function get_vote_score(): i32 {
   return Vehicle.get().vote_score
 }
 
+/**
+ * Get the current vehicle owner
+ */
+export function get_vehicle_owner(): string {
+  assert_contract_is_initialized()
+  return Vehicle.get().owner
+}
+
 // ----------------------------------------------------------------------------
 // Comments
 // ----------------------------------------------------------------------------
@@ -111,7 +124,8 @@ export function get_vote_score(): i32 {
  */
 export function add_comment(text: string): void {
   assert_contract_is_initialized()
-  assert(context.sender == context.predecessor, "Users must comment directly")
+  // assert(context.sender == context.predecessor, "Users must comment directly")
+  assert_signed_by_owner()
   assert_reasonable_comment_length(text)
   Vehicle.add_comment(text)
 }
@@ -214,7 +228,7 @@ function assert_signed_by_owner(): void {
 }
 
 /**
- * Track whether or not the meme has been initialized.
+ * Track whether or not the vehicle has been initialized.
  */
 function is_initialized(): bool {
   return storage.hasKey(VEHICLE_KEY);

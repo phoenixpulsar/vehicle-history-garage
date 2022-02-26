@@ -6,7 +6,7 @@ import {
   PersistentSet
 } from "near-sdk-as";
 
-import { VEHICLE_KEY, PAGE_SIZE, Category, AccountId, Money, Timestamp } from "../../utils";
+import { VEHICLE_KEY, PAGE_SIZE, SERVICES_SIZE, Category, AccountId, Money, Timestamp, idCreator, VehicleServiceId } from "../../utils";
 
 @nearBindgen
 export class Comment {
@@ -29,6 +29,17 @@ export class Vote {
 }
 
 @nearBindgen
+export class VehicleService {
+  id: VehicleServiceId = idCreator()
+  created_at: Timestamp = context.blockTimestamp;
+
+  constructor(
+    public serviceDate:string, 
+    public serviceNotes:string
+  ) { }
+}
+
+@nearBindgen
 export class Donation {
   // by default, without a constructor, all fields are public
   // so these instance fields will be set from the context
@@ -38,18 +49,25 @@ export class Donation {
   created_at: Timestamp = context.blockTimestamp;
 }
 
+
 @nearBindgen
 export class Vehicle {
   creator: AccountId = context.predecessor;
   created_at: Timestamp = context.blockTimestamp;
   vote_score: i32 = 0;
   total_donations: u128 = u128.Zero;
+  
 
   constructor(
     public title: string,
     public data: string,
     public category: Category,
     public owner: AccountId,
+    // From Vehicle Smart Contract
+    public make:string, 
+    public model:string, 
+    public dateAcquired:string,
+    public vehicleNotes:string
   ) { }
 
 
@@ -57,12 +75,21 @@ export class Vehicle {
   // Basic functions
   // ----------------------------------------------------------------------------
 
-  static create(title: string, data: string, category: Category, owner: AccountId): void {
+  static create(
+    title: string, 
+    data: string, 
+    category: Category, 
+    owner: AccountId, 
+    make: string, 
+    model:string, 
+    dateAcquired:string, 
+    vehicleNotes:string
+    ): void {
     // data has to have identifier from valid content provider
     assert(is_valid_vehicle_data(data), "Data is not valid, must start with valid 9gag.com URL")
 
     // save the vehicle to storage
-    const vehicle = new Vehicle(title, data, category, owner)
+    const vehicle = new Vehicle(title, data, category, owner, make, model, dateAcquired, vehicleNotes)
     this.set(vehicle)
   }
 
@@ -113,6 +140,21 @@ export class Vehicle {
 
   static recent_comments(count: i32 = PAGE_SIZE): Comment[] {
     return comments.get_last(count)
+  }
+
+  // ----------------------------------------------------------------------------
+  // Services
+  // ----------------------------------------------------------------------------
+  static add_service(serviceDate:string, serviceNotes:string): void {
+    services.push(new VehicleService(serviceDate, serviceNotes))
+  }
+
+  static get_service_count(): u32 {
+    return services.length
+  }
+
+  static recent_services(count: i32 = SERVICES_SIZE): VehicleService[] {
+    return services.get_last(count)
   }
 
   // ----------------------------------------------------------------------------
@@ -175,7 +217,8 @@ class Vector<T> extends PersistentVector<T> {
   }
 }
 
-const comments = new Vector<Comment>("c");
 const votes = new Vector<Vote>("v");
-const voters = new PersistentSet<AccountId>("vs");
+const comments = new Vector<Comment>("c");
+const services = new Vector<VehicleService>("s");
 const donations = new Vector<Donation>("d");
+const voters = new PersistentSet<AccountId>("vs");

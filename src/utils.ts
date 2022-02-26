@@ -21,6 +21,7 @@ export const VEHICLE_GARAGE_KEY = "state"
 
 // size constraints
 export const PAGE_SIZE = 10
+export const SERVICES_SIZE = 10
 export const MAX_COMMENT_LENGTH = 500
 
 
@@ -32,6 +33,7 @@ export const MAX_COMMENT_LENGTH = 500
  * Account IDs in NEAR are just strings.
  */
 export type AccountId = string;
+export type VehicleServiceId = string;
 
 /**
  * Money in NEAR is a u128.
@@ -42,6 +44,20 @@ export type Money = u128;
  * Timestamp in NEAR is a number.
  */
 export type Timestamp = u64;
+
+/**
+ * @function idCreator
+ * @return {string}
+ * Creates a unique id by combining sender + block height
+ */
+export function idCreator(): string {
+  // let title = Context.sender.substring(0, Context.sender.lastIndexOf('.'))
+  // let title = Context.sender
+  // let id = title + '-' + Context.blockIndex.toString()
+  let id =  Context.blockIndex.toString()
+
+  return id
+}
 
 /**
  * Category for grouping vehicles
